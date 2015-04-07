@@ -7,9 +7,13 @@ public class Processor
 {
 	LinkedList<Process> l;
 	Long total_time;
+	LinkedList<Quantum> res;
+	double average_wait;
+	
 	
 	public Processor() {
 		l = new LinkedList<Process>();
+		res = new LinkedList<Quantum>();
 		total_time = 0L;
 	}
 	
@@ -76,20 +80,39 @@ public class Processor
 	}
 	
 	public void schedule(int type) {
-		LinkedList<Integer> res = new LinkedList<Integer>();
+		res.clear();
+		double num_p = l.size();
 		Long total_wait = 0L;
-		for (Long i = 0L; i <= total_time; i++) {
-			int lucky_process;
+		for (Long i = 0L; i < total_time; i++) {
+			int lucky_process =	0;
 			switch(type) 
 			{
 				case 0:
 					lucky_process = fcfs_schedule(i);
 					break;
 			}
-			ListIterator<Process> li = l.listIterator();
-			while(li.hasNext()) {
-				
-			}
+			add_to_res(lucky_process);
+			total_wait+= getNumWaiting(i,lucky_process);
+		}
+		average_wait = total_wait/num_p;
+	}
+	
+	Long getNumWaiting(Long i,int lp) {
+		Long sum = 0L;
+		ListIterator<Process> li = l.listIterator();
+		while(li.hasNext()) {
+			Process p = li.next();
+			if (p.getArrivalTime() <= i && lp != p.getNumber())
+				sum++;
+		}
+		return sum;
+	}
+	
+	void add_to_res(int p) {
+		if (res.isEmpty() || res.getLast().getNum() != p) {
+			res.add(new Quantum(p));
+		} else {
+			res.getLast().increment();
 		}
 	}
 	

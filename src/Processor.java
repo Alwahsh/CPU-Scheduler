@@ -83,11 +83,14 @@ public class Processor
 		}
 	}
 	
-	public void sjf_preemptive_schedule(Long t) {
+	public void sjf_schedule(Long t, char type) {
 		while (it.hasNext()) {
 			Process p = it.next();
 			if ((long)p.getArrivalTime() <= t) {
 				ListIterator<Process> sji = queue.listIterator();
+				if (type == 'n')
+					if (sji.hasNext())
+						sji.next();
 				while(sji.hasNext()) {
 					if (sji.next().getTime() > p.getTime()) {
 						sji.previous();
@@ -116,7 +119,9 @@ public class Processor
 					fcfs_schedule(i);
 					break;
 				case 1:
-					sjf_preemptive_schedule(i);
+					sjf_schedule(i,'p');
+				case 2:
+					sjf_schedule(i,'n');
 			}
 			total_wait+= getNumWaiting();
 			add_to_res(cpu_quantum());

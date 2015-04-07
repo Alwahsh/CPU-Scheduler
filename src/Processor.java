@@ -73,13 +73,13 @@ public class Processor
 	public void fcfs_schedule(Long t) {
 		while (it.hasNext()) {
 			Process p = it.next();
-			if ((long)p.getArrivalTime() == t) {
+			if ((long)p.getArrivalTime() <= t) {
 				queue.add(p);
 			} else if ((long)p.getArrivalTime() > t){
+				it.previous();
 				break;
 			}
 		}
-		it.previous();
 	}
 	
 	public void schedule(int type) {
@@ -89,7 +89,7 @@ public class Processor
 		
 		//double num_p = l.size();
 		Long total_wait = 0L;
-		for (Long i = 0L; i < total_time; i++) {
+		for (Long i = 0L; it.hasNext() || !queue.isEmpty(); i++) {
 			switch(type) 
 			{
 				case 0:

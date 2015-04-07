@@ -9,6 +9,8 @@ public class Processor
 	LinkedList<Process> queue;
 	ListIterator<Process> it;
 	Long total_time;
+	Long qTime;
+	Long remainingQ;
 	LinkedList<Quantum> res;
 	double average_wait;
 	
@@ -19,6 +21,7 @@ public class Processor
 		queue = new LinkedList<Process>();
 		total_time = 0L;
 		average_wait = 0;
+		qTime = 1L;
 	}
 	
 	public void add_process(int t, int a) {
@@ -31,6 +34,10 @@ public class Processor
 		l.add(pr);
 		total_time+= t;
 		Collections.sort(l);
+	}
+	
+	public void set_qTime(Long qT) {
+		qTime = qT;
 	}
 	
 	public String[] get_processes_array() {
@@ -84,7 +91,6 @@ public class Processor
 	}
 	
 	public void sjf_priority_schedule(Long t, char type, char schedule) {
-		
 		while (it.hasNext()) {
 			Process p = it.next();
 			if ((long)p.getArrivalTime() <= t) {
@@ -114,11 +120,28 @@ public class Processor
 		}
 	}
 	
+	public void round_robin_schedule(Long t) {
+		while (it.hasNext()) {
+			Process p = it.next();
+			if ((long)p.getArrivalTime() <= t) {
+				queue.add(p);
+			} else if ((long)p.getArrivalTime() > t){
+				it.previous();
+				break;
+			}
+		}
+		if (remainingQ == 0) {
+			remainingQ = qTime;
+			Process p = queue.removeFirst();
+			queue.addLast(p);
+		}
+	}
+	
 	public void schedule(int type) {
 		res.clear();
 		queue.clear();
 		it = l.listIterator();
-		
+		remainingQ = qTime;
 		//double num_p = l.size();
 		Long total_wait = 0L;
 		for (Long i = 0L; it.hasNext() || !queue.isEmpty(); i++) {
@@ -129,12 +152,19 @@ public class Processor
 					break;
 				case 1:
 					sjf_priority_schedule(i,'p','t');
+					break;
 				case 2:
 					sjf_priority_schedule(i,'n','t');
+					break;
 				case 3:
 					sjf_priority_schedule(i, 'p', 'p');
+					break;
 				case 4:
 					sjf_priority_schedule(i, 'n', 'p');
+					break;
+				case 5:
+					round_robin_schedule(i);
+					remainingQ--;
 			}
 			total_wait+= getNumWaiting();
 			add_to_res(cpu_quantum());
@@ -151,8 +181,10 @@ public class Processor
 		else {
 			Process p = queue.getFirst();
 			p.decrement_time();
-			if (p.getTime() <= 0)
+			if (p.getTime() <= 0) {
 				queue.removeFirst();
+				remainingQ = qTime;
+			}
 			return p.getNumber();
 		}
 	}

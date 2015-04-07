@@ -34,7 +34,7 @@ public class scheduler
 	private JFrame frmCpuScheduler;
 	private JTextField time_txt;
 	private JTextField priority_txt;
-	private JTextField textField_2;
+	private JTextField tQ_txt;
 	private JTextField arrival_txt;
 
 	/**
@@ -133,7 +133,7 @@ public class scheduler
 		panel_1.add(lblPriority);
 		
 		JButton btnNewButton = new JButton("Add");
-		btnNewButton.setBounds(236, 44, 97, 40);
+		btnNewButton.setBounds(114, 95, 97, 40);
 		panel.add(btnNewButton);
 		
 		arrival_txt = new JTextField();
@@ -145,6 +145,12 @@ public class scheduler
 		JLabel lblArrival = new JLabel("Arrival:");
 		lblArrival.setBounds(8, 89, 70, 15);
 		panel.add(lblArrival);
+		
+		JButton btnRemove = new JButton("Remove");
+		btnRemove.setBounds(223, 95, 117, 40);
+		panel.add(btnRemove);
+		
+		
 		final JList processes_lst = new JList();
 		processes_lst.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		processes_lst.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -155,22 +161,17 @@ public class scheduler
 		lblProcesses.setBounds(40, 183, 88, 15);
 		frmCpuScheduler.getContentPane().add(lblProcesses);
 		
-		JButton btnRemove = new JButton("Remove");
-		
-		btnRemove.setBounds(506, 387, 117, 25);
-		frmCpuScheduler.getContentPane().add(btnRemove);
-		
 		final JPanel panel_2 = new JPanel();
 		panel_2.setBounds(40, 412, 117, 76);
 		frmCpuScheduler.getContentPane().add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setVisible(false);
 		
-		textField_2 = new JTextField();
-		textField_2.setFont(new Font("Dialog", Font.PLAIN, 25));
-		textField_2.setColumns(10);
-		textField_2.setBounds(0, 24, 67, 40);
-		panel_2.add(textField_2);
+		tQ_txt = new JTextField();
+		tQ_txt.setFont(new Font("Dialog", Font.PLAIN, 25));
+		tQ_txt.setColumns(10);
+		tQ_txt.setBounds(0, 24, 67, 40);
+		panel_2.add(tQ_txt);
 		
 		JLabel lblTimeQuantum = new JLabel("Time Quantum:");
 		lblTimeQuantum.setBounds(0, 5, 117, 15);
@@ -194,6 +195,25 @@ public class scheduler
 					panel_2.setVisible(false);
 				//JOptionPane.showMessageDialog(null, list.getSelectedIndex());
 				myP.clear_processes();
+				processes_lst.setModel(new AbstractListModel() {
+					String[] values = myP.get_processes_array();
+					public int getSize() {
+						return values.length;
+					}
+					public Object getElementAt(int index) {
+						return values[index];
+					}
+				});
+			}
+		});
+		
+		btnRemove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (processes_lst.isSelectionEmpty()) {
+					JOptionPane.showMessageDialog(null, "You must select a process to remove.");
+					return;
+				}
+				myP.remove_process(processes_lst.getSelectedIndex());
 				processes_lst.setModel(new AbstractListModel() {
 					String[] values = myP.get_processes_array();
 					public int getSize() {
@@ -252,28 +272,23 @@ public class scheduler
 			}
 		});
 		
-		btnRemove.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if (processes_lst.isSelectionEmpty()) {
-					JOptionPane.showMessageDialog(null, "You must select a process to remove.");
-					return;
-				}
-				myP.remove_process(processes_lst.getSelectedIndex());
-				processes_lst.setModel(new AbstractListModel() {
-					String[] values = myP.get_processes_array();
-					public int getSize() {
-						return values.length;
-					}
-					public Object getElementAt(int index) {
-						return values[index];
-					}
-				});
-			}
-		});
-		
 		btnSchedule.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				myP.schedule(schedulers_lst.getSelectedIndex());
+				int sel = schedulers_lst.getSelectedIndex();
+				if (sel == 5) {
+					Integer qTime = -1;
+					if (tQ_txt.getText().length() == 0) {
+						JOptionPane.showMessageDialog(null, "You must determine the Quantum");
+						return;
+					}
+					qTime = Integer.valueOf(tQ_txt.getText());
+					if (qTime <= 0) {
+						JOptionPane.showMessageDialog(null, "Quantum must be a positive number");
+						return;
+					}
+					myP.set_qTime((long)qTime);
+				}
+				myP.schedule(sel);
 				JOptionPane.showMessageDialog(null, myP.get_scheduled_data());
 				myP.clear_processes();
 				processes_lst.setModel(new AbstractListModel() {

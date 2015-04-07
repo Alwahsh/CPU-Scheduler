@@ -177,6 +177,7 @@ public class scheduler
 		panel_2.add(lblTimeQuantum);
 		
 		JButton btnSchedule = new JButton("Schedule");
+		
 		btnSchedule.setBounds(181, 412, 277, 76);
 		frmCpuScheduler.getContentPane().add(btnSchedule);
 		
@@ -224,9 +225,9 @@ public class scheduler
 					return;
 				}
 				int arr = Integer.parseInt(arrival_txt.getText());
-				if (arr <= 0)
+				if (arr < 0)
 				{
-					JOptionPane.showMessageDialog(null, "Arrival time must be positive.");
+					JOptionPane.showMessageDialog(null, "Arrival time can't be negative.");
 					return;
 				}
 				int priority = -1;
@@ -258,6 +259,23 @@ public class scheduler
 					return;
 				}
 				myP.remove_process(processes_lst.getSelectedIndex());
+				processes_lst.setModel(new AbstractListModel() {
+					String[] values = myP.get_processes_array();
+					public int getSize() {
+						return values.length;
+					}
+					public Object getElementAt(int index) {
+						return values[index];
+					}
+				});
+			}
+		});
+		
+		btnSchedule.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				myP.schedule(0);
+				JOptionPane.showMessageDialog(null, myP.get_scheduled_data());
+				myP.clear_processes();
 				processes_lst.setModel(new AbstractListModel() {
 					String[] values = myP.get_processes_array();
 					public int getSize() {

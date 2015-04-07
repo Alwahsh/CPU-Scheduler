@@ -13,6 +13,10 @@ public class Quantum
 		return num;
 	}
 	
+	public Integer getLength() {
+		return length;
+	}
+	
 	public void increment() {
 		length++;
 	}

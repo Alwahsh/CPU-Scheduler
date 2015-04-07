@@ -18,6 +18,7 @@ public class Processor
 		res = new LinkedList<Quantum>();
 		queue = new LinkedList<Process>();
 		total_time = 0L;
+		average_wait = 0;
 	}
 	
 	public void add_process(int t, int a) {
@@ -82,6 +83,25 @@ public class Processor
 		}
 	}
 	
+	public void sjf_preemptive_schedule(Long t) {
+		while (it.hasNext()) {
+			Process p = it.next();
+			if ((long)p.getArrivalTime() <= t) {
+				ListIterator<Process> sji = queue.listIterator();
+				while(sji.hasNext()) {
+					if (sji.next().getTime() > p.getTime()) {
+						sji.previous();
+						break;
+					}
+				}
+				sji.add(p);
+			} else {
+				it.previous();
+				break;
+			}
+		}
+	}
+	
 	public void schedule(int type) {
 		res.clear();
 		queue.clear();
@@ -95,11 +115,16 @@ public class Processor
 				case 0:
 					fcfs_schedule(i);
 					break;
+				case 1:
+					sjf_preemptive_schedule(i);
 			}
 			total_wait+= getNumWaiting();
 			add_to_res(cpu_quantum());
 		}
-		average_wait = total_wait/(double)l.size();
+		if (l.size() == 0)
+			average_wait = 0;
+		else
+			average_wait = total_wait/(double)l.size();
 	}
 	
 	int cpu_quantum() {
@@ -137,9 +162,13 @@ public class Processor
 		Integer i = 0;
 		while(li.hasNext()) {
 			Quantum q = li.next();
-			s+= "P";
-			s+= String.valueOf(q.getNum());
-			s+= ": ";
+			if (q.getNum() == 0) {
+				s+= "Idle: ";
+			} else {
+				s+= "P";
+				s+= String.valueOf(q.getNum());
+				s+= ": ";
+			}
 			s+= String.valueOf(i);
 			i+= q.getLength();
 			s+= " -> ";

@@ -273,7 +273,7 @@ public class scheduler
 		
 		btnSchedule.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				myP.schedule(0);
+				myP.schedule(schedulers_lst.getSelectedIndex());
 				JOptionPane.showMessageDialog(null, myP.get_scheduled_data());
 				myP.clear_processes();
 				processes_lst.setModel(new AbstractListModel() {

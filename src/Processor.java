@@ -55,7 +55,7 @@ public class Processor
 			s+= " - ";
 			s+= "Needs: ";
 			s+= String.valueOf(p.getTime());
-			s+= " Quantums";
+			s+= " Processor Time";
 			if (p.getPriority() > -1) {
 				s+= " - Priority: ";
 				s+= String.valueOf(p.getPriority());

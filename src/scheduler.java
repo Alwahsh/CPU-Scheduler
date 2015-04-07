@@ -228,38 +228,42 @@ public class scheduler
 		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (time_txt.getText().length() == 0)
-				{
-					JOptionPane.showMessageDialog(null, "Time can't be empty.");
-					return;
-				}
-				if (arrival_txt.getText().length() == 0)
-				{
-					JOptionPane.showMessageDialog(null, "Arrival time can't be empty.");
-					return;
-				}
-				int time = Integer.parseInt(time_txt.getText());
-				if (time <= 0)
-				{
-					JOptionPane.showMessageDialog(null, "Time must be positive.");
-					return;
-				}
-				int arr = Integer.parseInt(arrival_txt.getText());
-				if (arr < 0)
-				{
-					JOptionPane.showMessageDialog(null, "Arrival time can't be negative.");
-					return;
-				}
-				int priority = -1;
-				if (schedulers_lst.getSelectedIndex() == 3 || schedulers_lst.getSelectedIndex() == 4) {
-					if (priority_txt.getText().length() == 0)
+				try {
+					if (time_txt.getText().length() == 0)
 					{
-						JOptionPane.showMessageDialog(null, "Priority can't be empty.");
+						JOptionPane.showMessageDialog(null, "Time can't be empty.");
 						return;
 					}
-					priority = Integer.parseInt(priority_txt.getText());
+					if (arrival_txt.getText().length() == 0)
+					{
+						JOptionPane.showMessageDialog(null, "Arrival time can't be empty.");
+						return;
+					}
+					int time = Integer.parseInt(time_txt.getText());
+					if (time <= 0)
+					{
+						JOptionPane.showMessageDialog(null, "Time must be positive.");
+						return;
+					}
+					int arr = Integer.parseInt(arrival_txt.getText());
+					if (arr < 0)
+					{
+						JOptionPane.showMessageDialog(null, "Arrival time can't be negative.");
+						return;
+					}
+					int priority = -1;
+					if (schedulers_lst.getSelectedIndex() == 3 || schedulers_lst.getSelectedIndex() == 4) {
+						if (priority_txt.getText().length() == 0)
+						{
+							JOptionPane.showMessageDialog(null, "Priority can't be empty.");
+							return;
+						}
+						priority = Integer.parseInt(priority_txt.getText());
+					}
+					myP.add_process(time,arr,priority);
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, "Please use numbers only.");
 				}
-				myP.add_process(time,arr,priority);
 				processes_lst.setModel(new AbstractListModel() {
 					String[] values = myP.get_processes_array();
 					public int getSize() {
@@ -274,21 +278,26 @@ public class scheduler
 		
 		btnSchedule.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int sel = schedulers_lst.getSelectedIndex();
-				if (sel == 5) {
-					Integer qTime = -1;
-					if (tQ_txt.getText().length() == 0) {
-						JOptionPane.showMessageDialog(null, "You must determine the Quantum");
-						return;
+				try {
+					int sel = schedulers_lst.getSelectedIndex();
+					if (sel == 5) {
+						Integer qTime = -1;
+						if (tQ_txt.getText().length() == 0) {
+							JOptionPane.showMessageDialog(null, "You must determine the Quantum");
+							return;
+						}
+						qTime = Integer.valueOf(tQ_txt.getText());
+						if (qTime <= 0) {
+							JOptionPane.showMessageDialog(null, "Quantum must be a positive number");
+							return;
+						}
+						myP.set_qTime((long)qTime);
 					}
-					qTime = Integer.valueOf(tQ_txt.getText());
-					if (qTime <= 0) {
-						JOptionPane.showMessageDialog(null, "Quantum must be a positive number");
-						return;
-					}
-					myP.set_qTime((long)qTime);
+					myP.schedule(sel);
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, "Please use numbers only.");
+					return;
 				}
-				myP.schedule(sel);
 				ChartDrawer cd = new ChartDrawer(myP);
 				cd.setVisible(true);
 				myP.clear_processes();

@@ -83,7 +83,8 @@ public class Processor
 		}
 	}
 	
-	public void sjf_schedule(Long t, char type) {
+	public void sjf_priority_schedule(Long t, char type, char schedule) {
+		
 		while (it.hasNext()) {
 			Process p = it.next();
 			if ((long)p.getArrivalTime() <= t) {
@@ -92,7 +93,15 @@ public class Processor
 					if (sji.hasNext())
 						sji.next();
 				while(sji.hasNext()) {
-					if (sji.next().getTime() > p.getTime()) {
+					int comp1,comp2;
+					if (schedule == 'p') {
+						comp1 = sji.next().getPriority();
+						comp2 = p.getPriority();
+					} else {
+						comp1 = sji.next().getTime();
+						comp2 = p.getTime();
+					}
+					if (comp1 > comp2) {
 						sji.previous();
 						break;
 					}
@@ -119,9 +128,13 @@ public class Processor
 					fcfs_schedule(i);
 					break;
 				case 1:
-					sjf_schedule(i,'p');
+					sjf_priority_schedule(i,'p','t');
 				case 2:
-					sjf_schedule(i,'n');
+					sjf_priority_schedule(i,'n','t');
+				case 3:
+					sjf_priority_schedule(i, 'p', 'p');
+				case 4:
+					sjf_priority_schedule(i, 'n', 'p');
 			}
 			total_wait+= getNumWaiting();
 			add_to_res(cpu_quantum());

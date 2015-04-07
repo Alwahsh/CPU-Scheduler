@@ -230,4 +230,8 @@ public class Processor
 		return s;
 	}
 	
+	public LinkedList<Quantum> get_res() {
+		return res;
+	}
+	
 }

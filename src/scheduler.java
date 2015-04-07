@@ -72,7 +72,7 @@ public class scheduler
 	private void initialize()
 	{
 		frmCpuScheduler = new JFrame();
-		frmCpuScheduler.setTitle("CPU Scheduler");
+		frmCpuScheduler.setTitle("AbouElhamayed Scheduler");
 		frmCpuScheduler.setBounds(100, 100, 669, 527);
 		frmCpuScheduler.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmCpuScheduler.getContentPane().setLayout(null);
@@ -289,7 +289,8 @@ public class scheduler
 					myP.set_qTime((long)qTime);
 				}
 				myP.schedule(sel);
-				JOptionPane.showMessageDialog(null, myP.get_scheduled_data());
+				ChartDrawer cd = new ChartDrawer(myP);
+				cd.setVisible(true);
 				myP.clear_processes();
 				processes_lst.setModel(new AbstractListModel() {
 					String[] values = myP.get_processes_array();

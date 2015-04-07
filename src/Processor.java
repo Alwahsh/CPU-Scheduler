@@ -176,8 +176,10 @@ public class Processor
 	}
 	
 	int cpu_quantum() {
-		if (queue.isEmpty())
+		if (queue.isEmpty()) {
+			remainingQ = qTime;
 			return 0;
+		}
 		else {
 			Process p = queue.getFirst();
 			p.decrement_time();

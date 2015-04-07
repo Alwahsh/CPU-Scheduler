@@ -36,6 +36,7 @@ public class scheduler
 	private JTextField priority_txt;
 	private JTextField tQ_txt;
 	private JTextField arrival_txt;
+	private JTextField pause_txt;
 
 	/**
 	 * Launch the application.
@@ -182,6 +183,16 @@ public class scheduler
 		btnSchedule.setBounds(181, 412, 277, 76);
 		frmCpuScheduler.getContentPane().add(btnSchedule);
 		
+		pause_txt = new JTextField();
+		pause_txt.setFont(new Font("Dialog", Font.PLAIN, 25));
+		pause_txt.setColumns(10);
+		pause_txt.setBounds(498, 432, 67, 40);
+		frmCpuScheduler.getContentPane().add(pause_txt);
+		
+		JLabel lblPauseAt = new JLabel("Pause at:");
+		lblPauseAt.setBounds(498, 414, 117, 15);
+		frmCpuScheduler.getContentPane().add(lblPauseAt);
+		
 		schedulers_lst.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
 				int s = schedulers_lst.getSelectedIndex();
@@ -274,6 +285,10 @@ public class scheduler
 		
 		btnSchedule.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if (pause_txt.getText().length() > 0) {
+					Long pt = Long.valueOf(pause_txt.getText());
+					myP.set_end_time(pt);
+				}
 				int sel = schedulers_lst.getSelectedIndex();
 				if (sel == 5) {
 					Integer qTime = -1;
@@ -288,9 +303,10 @@ public class scheduler
 					}
 					myP.set_qTime((long)qTime);
 				}
-				myP.schedule(sel);
+				myP.do_scheduling_round(sel);
 				JOptionPane.showMessageDialog(null, myP.get_scheduled_data());
-				myP.clear_processes();
+				if (myP.is_done())
+					myP.clear_processes();
 				processes_lst.setModel(new AbstractListModel() {
 					String[] values = myP.get_processes_array();
 					public int getSize() {

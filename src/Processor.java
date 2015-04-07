@@ -9,8 +9,13 @@ public class Processor
 	LinkedList<Process> queue;
 	ListIterator<Process> it;
 	Long total_time;
+	Long total_wait;
 	Long qTime;
 	Long remainingQ;
+	Long startTime;
+	Long endTime;
+	Long tot_size;
+	boolean done;
 	LinkedList<Quantum> res;
 	double average_wait;
 	
@@ -22,6 +27,14 @@ public class Processor
 		total_time = 0L;
 		average_wait = 0;
 		qTime = 1L;
+		endTime = 0L;
+		tot_size = 0L;
+		res.clear();
+		queue.clear();
+		it = l.listIterator();
+		startTime = 0L;
+		remainingQ = qTime;
+		total_wait = 0L;
 	}
 	
 	public void add_process(int t, int a) {
@@ -34,10 +47,19 @@ public class Processor
 		l.add(pr);
 		total_time+= t;
 		Collections.sort(l);
+		tot_size++;
 	}
 	
 	public void set_qTime(Long qT) {
 		qTime = qT;
+	}
+	
+	public boolean is_done() {
+		return done;
+	}
+	
+	public void set_end_time(Long e) {
+		endTime = e;
 	}
 	
 	public String[] get_processes_array() {
@@ -70,11 +92,20 @@ public class Processor
 	public void remove_process(int i) {
 		Process rem = l.remove(i);
 		total_time-= rem.getTime();
+		tot_size--;
 	}
 	
 	public void clear_processes() {
 		l.clear();
 		total_time = 0L;
+		tot_size = 0L;
+		res.clear();
+		queue.clear();
+		it = l.listIterator();
+		startTime = 0L;
+		remainingQ = qTime;
+		//double num_p = l.size();
+		total_wait = 0L;
 	}
 	
 	
@@ -82,6 +113,7 @@ public class Processor
 		while (it.hasNext()) {
 			Process p = it.next();
 			if ((long)p.getArrivalTime() <= t) {
+				it.remove();
 				queue.add(p);
 			} else if ((long)p.getArrivalTime() > t){
 				it.previous();
@@ -141,11 +173,22 @@ public class Processor
 		res.clear();
 		queue.clear();
 		it = l.listIterator();
+		startTime = 0L;
 		remainingQ = qTime;
 		//double num_p = l.size();
-		Long total_wait = 0L;
-		for (Long i = 0L; it.hasNext() || !queue.isEmpty(); i++) {
-			switch(type) 
+		total_wait = 0L;
+		do_scheduling_round(type);
+	}
+	
+	public void do_scheduling_round(int type) {
+		it = l.listIterator();
+		done = true;
+		for (Long i = startTime; it.hasNext() || !queue.isEmpty(); i++) {
+			if (endTime > 0 && i == endTime) {
+				done = false;
+				return;
+			}
+			switch(type)
 			{
 				case 0:
 					fcfs_schedule(i);
@@ -172,7 +215,7 @@ public class Processor
 		if (l.size() == 0)
 			average_wait = 0;
 		else
-			average_wait = total_wait/(double)l.size();
+			average_wait = total_wait/(double)tot_size;
 	}
 	
 	int cpu_quantum() {
